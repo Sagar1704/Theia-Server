@@ -10,6 +10,28 @@ var users = require('./routes/users');
 
 var app = express();
 
+// ORM for MongoDB
+var mongoose = require('mongoose');
+
+//Connect to the database
+var configDB = require('./config/database.js');
+
+// mongoose configuration ===========================================================
+mongoose.connect(configDB.url); // connect to our database
+
+mongoose.connection.on('open', function (ref) {
+  console.log('Connected to mongo server.');  
+});
+mongoose.connection.on('error', function (err) {
+  console.log('Could not connect to mongo server!');
+  console.log(err);
+});
+
+// GZIP compression
+var compress = require('compression');
+// To use gzip compression
+app.use(compress());
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -56,5 +78,7 @@ app.use(function(err, req, res, next) {
   });
 });
 
+//API setup
+app.use('/api', require('./app/api'));
 
 module.exports = app;
